@@ -3,11 +3,14 @@ package com.prateek.exoplayerdemo
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.common.util.Util
+import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.dash.DashMediaSource
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import com.prateek.exoplayerdemo.databinding.ActivityMainBinding
 import com.prateek.exoplayerdemo.manager.DemoUtil
@@ -19,7 +22,22 @@ class OnlinePlayerActivity : AppCompatActivity(), Player.Listener {
     private var playWhenReady = true
     private lateinit var binding: ActivityMainBinding
     private var downloadTracker: DownloadTracker? = null
+
+    //    private val mediaItem by lazy {
+//        MediaItem.Builder()
+//            .setUri(VIDEO_URL)
+//            .setMediaId("dummyId")
+//            .setMediaMetadata(
+//                MediaMetadata.Builder()
+//                    .setTitle("Demo Video")
+//                    .build()
+//            )
+//            .build()
+//    }
     private val mediaItem by lazy {
+        val drmConfig =
+            MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                .setLicenseUri(LICENSE_URL)
         MediaItem.Builder()
             .setUri(VIDEO_URL)
             .setMediaId("dummyId")
@@ -28,12 +46,14 @@ class OnlinePlayerActivity : AppCompatActivity(), Player.Listener {
                     .setTitle("Demo Video")
                     .build()
             )
-            .build()
+            .setDrmConfiguration(drmConfig.build()).build()
     }
 
     companion object {
         const val VIDEO_URL =
-            "https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8"
+            "https://prod-pocketfm-cors-header.s3.ap-southeast-1.amazonaws.com/test_widevine/h264.mpd"
+        const val LICENSE_URL =
+            "https://widevine.gumlet.com/licence/63a5589d669e99d3ded2b8e9?expires=1694630887236&rental_duration=300000&token=c7e34b95ea61865ec5cc91883a0401ff92ab2f36"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,13 +82,23 @@ class OnlinePlayerActivity : AppCompatActivity(), Player.Listener {
         player = ExoPlayer.Builder(this).build()
         player?.playWhenReady = true
         binding.playerExo.player = player
-        val defaultHttpDataSourceFactory = DemoUtil.getDataSourceFactory(this)
-        val mediaSource =
-            HlsMediaSource.Factory(defaultHttpDataSourceFactory).createMediaSource(mediaItem)
-        player?.setMediaSource(mediaSource)
-        player?.seekTo(playbackPosition)
-        player?.playWhenReady = playWhenReady
-        player?.prepare()
+////        val defaultHttpDataSourceFactory = DemoUtil.getDataSourceFactory(this)
+////        val mediaSource =
+////            HlsMediaSource.Factory(defaultHttpDataSourceFactory).createMediaSource(mediaItem)
+//        val defaultHttpDataSourceFactory = DefaultHttpDataSource.Factory()
+//        val drmConfig =
+//            MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+//                .setLicenseUri("https://widevine.gumlet.com/licence/63a5589d669e99d3ded2b8e9?expires=1694614883183&token=1df4cf6c716313696e6cf2563ee9b220f447985a")
+//        val mediaItem = MediaItem.Builder()
+//            .setUri("https://prod-pocketfm-cors-header.s3.ap-southeast-1.amazonaws.com/test_widevine/h264.mpd")
+//            .setDrmConfiguration(drmConfig.build())
+//        val mediaSource =
+//            DashMediaSource.Factory(defaultHttpDataSourceFactory)
+//                .createMediaSource(mediaItem.build())
+//        player?.setMediaSource(mediaSource)
+//        player?.seekTo(playbackPosition)
+//        player?.playWhenReady = playWhenReady
+//        player?.prepare()
 
     }
 

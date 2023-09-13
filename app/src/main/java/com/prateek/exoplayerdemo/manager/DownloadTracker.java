@@ -16,6 +16,8 @@
 package com.prateek.exoplayerdemo.manager;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.prateek.exoplayerdemo.manager.VideoDrmKeyManager.KEY_SETTINGS;
+import static com.prateek.exoplayerdemo.manager.VideoDrmKeyManager.KEY_WIDEVINE;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -291,6 +293,7 @@ public class DownloadTracker {
 
     private void onOfflineLicenseFetched(DownloadHelper helper, byte[] keySetId) {
       this.keySetId = keySetId;
+        new VideoDrmKeyManager(context, KEY_SETTINGS).saveKeySetId(KEY_WIDEVINE,keySetId);
       onDownloadPrepared(helper);
     }
 

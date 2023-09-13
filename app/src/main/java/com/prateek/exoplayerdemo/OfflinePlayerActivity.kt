@@ -6,13 +6,19 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.media3.common.C
+import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.dash.DashMediaSource
 import androidx.media3.exoplayer.offline.DownloadHelper
 import com.prateek.exoplayerdemo.databinding.ActivityMainBinding
 import com.prateek.exoplayerdemo.manager.DemoUtil
 import com.prateek.exoplayerdemo.manager.DownloadTracker
+import com.prateek.exoplayerdemo.manager.VideoDrmKeyManager
+import com.prateek.exoplayerdemo.manager.VideoDrmKeyManager.Companion.KEY_SETTINGS
+import com.prateek.exoplayerdemo.manager.VideoDrmKeyManager.Companion.KEY_WIDEVINE
 
 class OfflinePlayerActivity : AppCompatActivity(), Player.Listener {
     private var player: ExoPlayer? = null
@@ -20,10 +26,12 @@ class OfflinePlayerActivity : AppCompatActivity(), Player.Listener {
     private var playWhenReady = true
     private lateinit var binding: ActivityMainBinding
     private var downloadTracker: DownloadTracker? = null
-
+    private val drmKeyManager by lazy {
+        VideoDrmKeyManager(this, KEY_SETTINGS)
+    }
     companion object {
         const val VIDEO_URL =
-            "https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8"
+            "https://prod-pocketfm-cors-header.s3.ap-southeast-1.amazonaws.com/test_widevine/h264.mpd"
 
         fun getIntent(context: Context): Intent {
             return Intent(context, OfflinePlayerActivity::class.java)
@@ -45,12 +53,30 @@ class OfflinePlayerActivity : AppCompatActivity(), Player.Listener {
         player?.playWhenReady = true
         binding.playerExo.player = player
 
-        val mediaSource = downloadTracker?.getDownloadRequest(Uri.parse(VIDEO_URL))!!.let {
-            DownloadHelper.createMediaSource(
-                it,
-                DemoUtil.getDataSourceFactory(this)
-            )
-        }
+//        val mediaSource = downloadTracker?.getDownloadRequest(Uri.parse(VIDEO_URL))!!.let {
+//            DownloadHelper.createMediaSource(
+//                it,
+//                DemoUtil.getDataSourceFactory(this)
+//            )
+//        }
+
+//        setDrmConfiguration(
+//            MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+//                .setKeySetId(
+//                    VideoDrmKeyManager(context, VideoDrmKeyManager.KEY_SETTINGS).saveKeySetId(
+//                        VideoDrmKeyManager.KEY_WIDEVINE, keySetId
+//                    ))
+//                .build()
+//        )
+        val drmConfig =
+            MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                .setKeySetId(drmKeyManager.getKeySetId(KEY_WIDEVINE))
+        val mediaItem = MediaItem.Builder()
+            .setUri(VIDEO_URL)
+            .setDrmConfiguration(drmConfig.build())
+        val mediaSource =
+            DashMediaSource.Factory(DemoUtil.getDataSourceFactory(this))
+                .createMediaSource(mediaItem.build())
         player?.setMediaSource(mediaSource)
         player?.seekTo(playbackPosition)
         player?.playWhenReady = playWhenReady
