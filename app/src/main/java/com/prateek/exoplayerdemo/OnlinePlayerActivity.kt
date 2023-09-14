@@ -53,7 +53,7 @@ class OnlinePlayerActivity : AppCompatActivity(), Player.Listener {
         const val VIDEO_URL =
             "https://prod-pocketfm-cors-header.s3.ap-southeast-1.amazonaws.com/test_widevine/h264.mpd"
         const val LICENSE_URL =
-            "https://widevine.gumlet.com/licence/63a5589d669e99d3ded2b8e9?expires=1694630887236&rental_duration=300000&token=c7e34b95ea61865ec5cc91883a0401ff92ab2f36"
+            "https://widevine.gumlet.com/licence/63a5589d669e99d3ded2b8e9?expires=1694668798601&rental_duration=300&token=e227e0ea97d4af40a9192a127c35e35dcea26bba"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

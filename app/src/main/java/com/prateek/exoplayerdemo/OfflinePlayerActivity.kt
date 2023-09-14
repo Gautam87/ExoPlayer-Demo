@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -12,6 +13,8 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.dash.DashMediaSource
+import androidx.media3.exoplayer.drm.DrmSessionEventListener
+import androidx.media3.exoplayer.drm.OfflineLicenseHelper
 import androidx.media3.exoplayer.offline.DownloadHelper
 import com.prateek.exoplayerdemo.databinding.ActivityMainBinding
 import com.prateek.exoplayerdemo.manager.DemoUtil
@@ -29,6 +32,10 @@ class OfflinePlayerActivity : AppCompatActivity(), Player.Listener {
     private val drmKeyManager by lazy {
         VideoDrmKeyManager(this, KEY_SETTINGS)
     }
+    private val eventDispatcher by lazy {
+        DrmSessionEventListener.EventDispatcher()
+    }
+
     companion object {
         const val VIDEO_URL =
             "https://prod-pocketfm-cors-header.s3.ap-southeast-1.amazonaws.com/test_widevine/h264.mpd"
@@ -68,6 +75,10 @@ class OfflinePlayerActivity : AppCompatActivity(), Player.Listener {
 //                    ))
 //                .build()
 //        )
+
+        if(!hasValidWidevineLicense()){
+            Toast.makeText(this, "License Expired", Toast.LENGTH_SHORT).show()
+        }
         val drmConfig =
             MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
                 .setKeySetId(drmKeyManager.getKeySetId(KEY_WIDEVINE))
@@ -83,6 +94,23 @@ class OfflinePlayerActivity : AppCompatActivity(), Player.Listener {
         player?.prepare()
 
     }
+
+    fun hasValidWidevineLicense(): Boolean = try {
+        drmKeyManager.getKeySetId(KEY_WIDEVINE)?.let { bytes ->
+            OfflineLicenseHelper.newWidevineInstance(
+                "",
+                DemoUtil.getDataSourceFactory(this),
+                eventDispatcher
+            ).getLicenseDurationRemainingSec(bytes).also {
+                return it.first > 0
+            }
+        }
+        false
+    } catch (e: Exception) {
+        e.printStackTrace()
+        false
+    }
+
 
     private fun releasePlayer() {
         player?.let {
@@ -114,6 +142,7 @@ class OfflinePlayerActivity : AppCompatActivity(), Player.Listener {
             initPlayer()
         }
     }
+
     override fun onPause() {
         super.onPause()
         if (Util.SDK_INT < 24) {
