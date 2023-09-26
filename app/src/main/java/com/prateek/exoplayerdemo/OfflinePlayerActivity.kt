@@ -38,7 +38,7 @@ class OfflinePlayerActivity : AppCompatActivity(), Player.Listener {
 
     companion object {
         const val VIDEO_URL =
-            "https://prod-pocketfm-cors-header.s3.ap-southeast-1.amazonaws.com/test_widevine/h264.mpd"
+            "https://prod-pocketfm-cors-header.s3.ap-southeast-1.amazonaws.com/test_widevine_2/h264.mpd"
 
         fun getIntent(context: Context): Intent {
             return Intent(context, OfflinePlayerActivity::class.java)
@@ -102,6 +102,7 @@ class OfflinePlayerActivity : AppCompatActivity(), Player.Listener {
                 DemoUtil.getDataSourceFactory(this),
                 eventDispatcher
             ).getLicenseDurationRemainingSec(bytes).also {
+                Toast.makeText(this, "Remaining "+it.first+" sec", Toast.LENGTH_SHORT).show()
                 return it.first > 0
             }
         }

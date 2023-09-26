@@ -19,6 +19,7 @@ import static com.prateek.exoplayerdemo.manager.DemoUtil.DOWNLOAD_NOTIFICATION_C
 
 import android.app.Notification;
 import android.content.Context;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.media3.common.util.NotificationUtil;
@@ -115,6 +116,7 @@ public class OfflineVideoDownloadService extends DownloadService {
                                 R.drawable.exo_ic_check,
                                 /* contentIntent= */ null,
                                 Util.fromUtf8Bytes(download.request.data));
+                Toast.makeText(context, "Download Complete", Toast.LENGTH_SHORT).show();
             } else if (download.state == Download.STATE_FAILED) {
                 notification =
                         notificationHelper.buildDownloadFailedNotification(
