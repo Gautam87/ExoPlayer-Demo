@@ -46,14 +46,15 @@ class OnlinePlayerActivity : AppCompatActivity(), Player.Listener {
                     .setTitle("Demo Video")
                     .build()
             )
-            .setDrmConfiguration(drmConfig.build()).build()
+//            .setDrmConfiguration(drmConfig.build())
+            .build()
     }
 
     companion object {
         const val VIDEO_URL =
-            "https://prod-pocketfm-cors-header.s3.ap-southeast-1.amazonaws.com/test_widevine_2/h264.mpd"
+            "https://prod-pocketfm-cors-header.s3.ap-southeast-1.amazonaws.com/test_vp9_codec/output.m3u8"
         const val LICENSE_URL =
-            "https://widevine.gumlet.com/licence/63a5589d669e99d3ded2b8e9?expires=1695227165224&rental_duration=300&playback_duration=360&token=94438565370dd2b45952b03601beb30e56979597"
+            "https://widevine.gumlet.com/licence/63a5589d669e99d3ded2b8e9?expires=1697027764010&rental_duration=1800&playback_duration=3600&token=cdd130a36afbb91999e1fd751cbc8b025a501f64"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

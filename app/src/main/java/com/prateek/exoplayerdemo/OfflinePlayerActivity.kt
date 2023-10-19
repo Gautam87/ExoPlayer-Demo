@@ -15,6 +15,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.dash.DashMediaSource
 import androidx.media3.exoplayer.drm.DrmSessionEventListener
 import androidx.media3.exoplayer.drm.OfflineLicenseHelper
+import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.offline.DownloadHelper
 import com.prateek.exoplayerdemo.databinding.ActivityMainBinding
 import com.prateek.exoplayerdemo.manager.DemoUtil
@@ -38,7 +39,7 @@ class OfflinePlayerActivity : AppCompatActivity(), Player.Listener {
 
     companion object {
         const val VIDEO_URL =
-            "https://prod-pocketfm-cors-header.s3.ap-southeast-1.amazonaws.com/test_widevine_2/h264.mpd"
+            "https://prod-pocketfm-cors-header.s3.ap-southeast-1.amazonaws.com/test_vp9_codec/output.m3u8"
 
         fun getIntent(context: Context): Intent {
             return Intent(context, OfflinePlayerActivity::class.java)
@@ -76,17 +77,17 @@ class OfflinePlayerActivity : AppCompatActivity(), Player.Listener {
 //                .build()
 //        )
 
-        if(!hasValidWidevineLicense()){
-            Toast.makeText(this, "License Expired", Toast.LENGTH_SHORT).show()
-        }
-        val drmConfig =
-            MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
-                .setKeySetId(drmKeyManager.getKeySetId(KEY_WIDEVINE))
+//        if(!hasValidWidevineLicense()){
+//            Toast.makeText(this, "License Expired", Toast.LENGTH_SHORT).show()
+//        }
+//        val drmConfig =
+//            MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+//                .setKeySetId(drmKeyManager.getKeySetId(KEY_WIDEVINE))
         val mediaItem = MediaItem.Builder()
             .setUri(VIDEO_URL)
-            .setDrmConfiguration(drmConfig.build())
+//            .setDrmConfiguration(drmConfig.build())
         val mediaSource =
-            DashMediaSource.Factory(DemoUtil.getDataSourceFactory(this))
+            HlsMediaSource.Factory(DemoUtil.getDataSourceFactory(this))
                 .createMediaSource(mediaItem.build())
         player?.setMediaSource(mediaSource)
         player?.seekTo(playbackPosition)
